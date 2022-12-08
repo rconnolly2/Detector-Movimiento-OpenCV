@@ -14,8 +14,15 @@ while True:
         diferencia = cv2.absdiff(frame, frame2)
         diferencia_gris = cv2.cvtColor(diferencia, cv2.COLOR_RGB2GRAY)
         diferencia_gris_blur = cv2.GaussianBlur(diferencia_gris, (5, 5), 0)
-        _, threshold = cv2.threshold(diferencia_gris_blur, 10, 255, cv2.THRESH_BINARY_INV)
-        cv2.imshow("Detector Personas", threshold)
+        _, threshold = cv2.threshold(diferencia_gris_blur, 10, 255, cv2.THRESH_BINARY)
+
+        kernel = np.zeros((5,5), np.uint8)
+        threshold_dilatado = cv2.dilate(threshold, kernel, iterations=2)
+
+        #Contornos deteccion y filtro de contornos por tamaño de su area
+        contornos, _ = cv2.findContours(threshold_dilatado, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        frame = cv2.drawContours(frame, contornos, -1, (255, 0, 0), 3)
+        cv2.imshow("Detector Personas", frame)
         ventana = cv2.waitKey(10)
         if ventana == ord("q"):
             break
